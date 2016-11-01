@@ -1,0 +1,44 @@
+language: php
+php:
+- 5.4
+- 5.5
+- 5.6
+- hhvm
+env:
+  global:
+  - secure: ZcQqlzRb5zYeyI0tnMMmWqIXOInClHDs+5DrFZ1GovPsLjNnjWgA4uGlXddU07l2WfKULlT6+RMEPUDzB04rsQHqwQHN0Nv9stJcY7WhzG+Xs+Zlr1h/2mi9Y2CsEF/Tq30buLSQwmKc6pdiAMh5ll+y8+7Yt4yv8WcLaIy5CMc=
+branches:
+  only:
+  - master
+  - /^deploy-.*$/
+
+before_script:
+- composer self-update
+- composer install --prefer-source --no-interaction --dev
+- echo ${TRAVIS_BUILD_DIR}
+- echo ${TRAVIS_COMMIT}
+- echo ${TRAVIS_COMMIT_RANGE}
+- echo ${GITHUB_TOKEN}
+- echo ${TRAVIS_REPO_SLUG}
+script:
+- phpunit
+after_success:
+- git remote show origin
+- git config user.name sajib
+- git config user.email sajib@thetigerworks.com
+- git show-ref
+- git branch
+- git add .
+- echo ${TRAVIS_BRANCH}
+- git branch -a
+- git log --graph
+- git push https://${GITHUB_TOKEN}:x-oauth-basic@github.com/${TRAVIS_REPO_SLUG}.git HEAD:master
+matrix:
+  allow_failures:
+  - php: 5.6
+  - php: hhvm
+  fast_finish: true
+notifications:
+  on_success: never
+  on_failure: always
+
